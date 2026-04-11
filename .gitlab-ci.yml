@@ -1,0 +1,39 @@
+stages:
+  - build
+  - test
+  - coverage
+  
+variables:
+  PRESET: "clang-debug-dev"
+  BUILD_DIR: "build/clang-debug-dev"
+  TEST_DIR: "build/clang-debug-dev/tests"
+  
+build-job:
+  stage: build
+  script:
+    - cmake --preset $PRESET
+    - cmake --build $BUILD_DIR
+  artifacts:
+    paths:
+      - $BUILD_DIR
+
+test-job:
+  stage: test
+  dependencies:
+    - build-job
+  script:
+    - LLVM_PROFILE_FILE="coverage-%p.profraw" ctest --preset test-$PRESET
+  artifacts:
+    paths:
+      - $TEST_DIR
+    
+coverage-job:
+  stage: coverage
+  dependencies:
+    - test-job
+  script:
+    - scripts/coverage.sh $TEST_DIR src
+  artifacts:
+    when: always
+    paths:
+      - $TEST_DIR/coverage-html
