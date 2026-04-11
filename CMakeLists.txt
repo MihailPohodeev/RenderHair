@@ -6,6 +6,8 @@ include("cmake/Setup.cmake")
 
 option(RENDERHAIR_BUILD_TESTS "build tests" ${RENDERHAIR_ENABLE_DEVELOPER_MODE})
 
+find_package(OGRE REQUIRED COMPONENTS Bites CONFIG)
+
 add_subdirectory("deps" EXCLUDE_FROM_ALL)
 add_subdirectory("src/app")
 add_subdirectory("src/lib")
