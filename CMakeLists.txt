@@ -7,6 +7,8 @@ include("cmake/Setup.cmake")
 option(RENDERHAIR_BUILD_TESTS "build tests" ${RENDERHAIR_ENABLE_DEVELOPER_MODE})
 
 find_package(OGRE REQUIRED COMPONENTS Bites CONFIG)
+message(STATUS "Ogre libs : ${OGRE_LIBRARIES}")
+message(STATUS "Ogre plugin dirs : ${OGRE_PLUGIN_DIR}")
 
 add_subdirectory("deps" EXCLUDE_FROM_ALL)
 add_subdirectory("src/app")

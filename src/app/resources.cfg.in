@@ -1,0 +1,9 @@
+[General]
+FileSystem=@OGRE_MEDIA_DIR@
+FileSystem=@OGRE_MEDIA_DIR@/materials/scripts
+FileSystem=@OGRE_MEDIA_DIR@/materials/textures
+FileSystem=@OGRE_MEDIA_DIR@/models
+FileSystem=@OGRE_MEDIA_DIR@/materials/programs/GLSL
+FileSystem=@OGRE_MEDIA_DIR@/materials/programs/GLSL150
+FileSystem=@OGRE_MEDIA_DIR@/RTShaderLib/GLSL
+FileSystem=.

@@ -1,0 +1,11 @@
+#ifndef RENDER_HAIR_PHYSICSCONFIG_HPP
+#define RENDER_HAIR_PHYSICSCONFIG_HPP
+
+namespace RenderHair
+{
+  const float MINIMAL_DELTA_TIME = 0.033F;
+
+  const float EPS = 0.001F;
+}
+
+#endif  // RENDER_HAIR_PHYSICSCONFIG_HPP
