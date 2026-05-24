@@ -11,7 +11,7 @@ message(STATUS "Ogre libs : ${OGRE_LIBRARIES}")
 message(STATUS "Ogre plugin dirs : ${OGRE_PLUGIN_DIR}")
 
 add_subdirectory("deps" EXCLUDE_FROM_ALL)
-add_subdirectory("src/app")
+# add_subdirectory("src/app")
 add_subdirectory("src/lib")
 
 if (RENDERHAIR_BUILD_TESTS)
