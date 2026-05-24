@@ -12,8 +12,7 @@ build-windows-job:
   stage: build
   tags: [windows]
   script:
-    - >
-      cmake -B build --preset 'msvc-debug-dev'
-      -DCMAKE_PREFIX_PATH="${PATH_TO_OGRE3D};${PATH_TO_GLM}"
-      -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl
+    - |
+      & "C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\Tools\Launch-VsDevShell.ps1"
+    - cmake -B build --preset 'msvc-debug-dev' -DCMAKE_PREFIX_PATH="${PATH_TO_OGRE3D};${PATH_TO_GLM}"
     - cmake --build build
