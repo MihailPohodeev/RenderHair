@@ -13,6 +13,6 @@ build-windows-job:
   tags: [windows]
   script:
     - |
-      & "C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\Tools\Launch-VsDevShell.ps1"
+      & "C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\Tools\Launch-VsDevShell.ps1" -Arch amd64
     - cmake -B build --preset 'msvc-debug-dev' -DCMAKE_PREFIX_PATH="${PATH_TO_OGRE3D};${PATH_TO_GLM}"
     - cmake --build build
