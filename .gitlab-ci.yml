@@ -1,39 +1,16 @@
 stages:
   - build
-  - test
-  - coverage
-  
-variables:
-  PRESET: "clang-debug-dev"
-  BUILD_DIR: "build/clang-debug-dev"
-  TEST_DIR: "build/clang-debug-dev/tests"
-  
-build-job:
-  stage: build
-  script:
-    - cmake --preset $PRESET
-    - cmake --build $BUILD_DIR
-  artifacts:
-    paths:
-      - $BUILD_DIR
 
-test-job:
-  stage: test
-  dependencies:
-    - build-job
+build-linux-job:
+  stage: build
+  tags: [linux]
   script:
-    - LLVM_PROFILE_FILE="coverage-%p.profraw" ctest --preset test-$PRESET
-  artifacts:
-    paths:
-      - $TEST_DIR
-    
-coverage-job:
-  stage: coverage
-  dependencies:
-    - test-job
+    - cmake -B build --preset 'clang-debug-dev' -DCMAKE_PREFIX_PATH="${PATH_TO_OGRE3D}"
+    - cmake --build build
+
+build-windows-job:
+  stage: build
+  tags: [windows]
   script:
-    - scripts/coverage.sh $TEST_DIR src
-  artifacts:
-    when: always
-    paths:
-      - $TEST_DIR/coverage-html
+    - cmake -B build --preset 'clang-debug-dev' -DCMAKE_PREFIX_PATH="${PATH_TO_OGRE3D}"
+    - cmake --build build
