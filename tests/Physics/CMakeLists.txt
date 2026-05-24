@@ -1,0 +1,2 @@
+RenderHair_add_test(test_hair_roots_allocation)
+target_link_libraries(test_hair_roots_allocation PRIVATE RenderHair)

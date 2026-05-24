@@ -1,0 +1,14 @@
+
+material sphere.objDefaultMaterial
+{
+	technique
+	{
+		pass 
+		{
+			ambient 0 0 0 1
+			diffuse 0.6 0.6 0.6 1
+		}
+
+	}
+
+}

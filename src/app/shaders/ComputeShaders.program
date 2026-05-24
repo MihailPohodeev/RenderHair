@@ -1,0 +1,9 @@
+compute_program VerletPhysics glsl
+{
+    source VerletPhysics.glsl
+
+    default_params
+    {
+        param_named delta_time float 0.016
+    }
+}

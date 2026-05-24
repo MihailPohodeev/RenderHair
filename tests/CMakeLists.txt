@@ -20,7 +20,4 @@ function(RenderHair_add_test TARGET_NAME)
 
 endfunction()
 
-
-RenderHair_add_test(test_RenderHair)
-target_link_libraries(test_RenderHair PRIVATE RenderHair)
-
+add_subdirectory(Physics)
