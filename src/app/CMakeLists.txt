@@ -1,15 +1,9 @@
 add_executable(RenderHair-app WIN32
     "main.cpp"
-    "auxiliary.hpp"
     "plugins.cfg.in"
     "resources.cfg.in"
-    "ico/app.rc" # windows icon
 )
-target_link_libraries(RenderHair-app
-    PRIVATE
-        RenderHair
-        OgreBites
-)
+target_link_libraries(RenderHair-app PRIVATE RenderHair_Lib_Render)
 RenderHair_setup_target(RenderHair-app)
 
 add_library(RenderHair-Assets INTERFACE

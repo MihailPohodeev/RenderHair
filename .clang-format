@@ -1,12 +1,12 @@
 BasedOnStyle: Google
-
 NamespaceIndentation: All
+
+ColumnLimit: 120
 
 AllowShortBlocksOnASingleLine: Always
 AllowShortLambdasOnASingleLine: Empty
 AllowShortCaseLabelsOnASingleLine: true
 AllowShortIfStatementsOnASingleLine: true
-AllowShortCaseExpressionOnASingleLine: true
 AllowShortCompoundRequirementOnASingleLine: true
 
 PackConstructorInitializers: Never
