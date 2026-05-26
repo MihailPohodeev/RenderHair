@@ -3,8 +3,8 @@
 #include <OgreSubMesh.h>
 
 namespace RenderHair::Render {
-  std::vector<Core::Triangle> convert_mesh_to_triangles(const Ogre::MeshPtr &mesh) {
-    std::vector<Core::Triangle> all_triangles;
+  std::vector<Triangle> convert_mesh_to_triangles(const Ogre::MeshPtr &mesh) {
+    std::vector<Triangle> all_triangles;
 
     const size_t submesh_amount = mesh->getNumSubMeshes();
     for (unsigned short i = 0; i < submesh_amount; ++i) {
@@ -64,7 +64,7 @@ namespace RenderHair::Render {
         const uint32_t idx1 = get_index(triangle_num * 3 + 1);
         const uint32_t idx2 = get_index(triangle_num * 3 + 2);
 
-        Core::Triangle tri;
+        Triangle tri;
         tri.submesh_index = i;
         tri.triangle_index = static_cast<int32_t>(triangle_num);
 

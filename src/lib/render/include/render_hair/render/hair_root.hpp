@@ -3,9 +3,9 @@
 #include <cstdint>
 #include <glm/vec2.hpp>
 
-namespace RenderHair::Core {
+namespace RenderHair::Render {
   struct HairRoot {
     int32_t triangle_index;
     glm::vec2 baricentric_coords;
   };
-}  // namespace RenderHair::Core
+}  // namespace RenderHair::Render

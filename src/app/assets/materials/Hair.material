@@ -1,0 +1,42 @@
+// 1. ОБЪЯВЛЯЕМ ВЕРТЕКСНЫЙ ШЕЙДЕР
+vertex_program MyHairVS_GLSL glsl
+{
+    source HairVertex.glsl
+
+    // Ogre автоматически передаст матрицу камеры (просмотра-проекции) в шейдер
+    default_params
+    {
+        param_named_auto worldViewProjMatrix worldviewproj_matrix
+    }
+}
+
+// 2. ОБЪЯВЛЯЕМ ФРАГМЕНТНЫЙ (ПИКСЕЛЬНЫЙ) ШЕЙДЕР
+fragment_program MyHairFS_GLSL glsl
+{
+    source HairFragment.glsl
+}
+
+// 3. СОЗДАЕМ МАТЕРИАЛ, КОТОРЫЙ ИХ СВЯЗЫВАЕТ
+material MyRedPointMaterial
+{
+    technique
+    {
+        pass
+        {
+            // Отключаем стандартный свет Ogre, у нас свой шейдер
+            lighting off
+
+            // Заставляем драйвер рисовать жирные точки (размер в пикселях)
+            point_size 3.0
+
+            // Подключаем наши GLSL шейдеры к этому проходу рендеринга
+            vertex_program_ref MyHairVS_GLSL
+            {
+            }
+
+            fragment_program_ref MyHairFS_GLSL
+            {
+            }
+        }
+    }
+}

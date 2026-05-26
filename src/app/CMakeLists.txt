@@ -3,17 +3,14 @@ add_executable(RenderHair-app WIN32
     "plugins.cfg.in"
     "resources.cfg.in"
 )
-target_link_libraries(RenderHair-app PRIVATE RenderHair_Lib_Render)
+target_link_libraries(RenderHair-app PRIVATE RenderHair_Lib_Render RenderHair_Lib_Physics)
 RenderHair_setup_target(RenderHair-app)
 
 add_library(RenderHair-Assets INTERFACE
-    "shaders/HairSphere.program"
-    "shaders/simple.vert"
-    "shaders/simple.frag"
-    "shaders/ComputeShaders.program"
-    "shaders/VerletPhysics.glsl"
+    "shaders/HairVertex.glsl"
+    "shaders/HairFragment.glsl"
 
-    "assets/materials/HairSphere.material"
+    "assets/materials/Hair.material"
 
     "assets/textures/HairSphere_hair_distribution_map.png"
     "assets/textures/RustySteel.png"

@@ -3,9 +3,8 @@
 #include <OgreCameraMan.h>
 #include <OgreRTShaderSystem.h>
 
-#include <format>
-#include <iostream>
-
+#include "render_hair/render/hair_generator.hpp"
+#include "render_hair/render/hair_model.hpp"
 #include "render_hair/render/mesh_conversion.hpp"
 
 class KeyHandler : public OgreBites::InputListener {
@@ -38,10 +37,13 @@ int main() {
   scnMgr->setAmbientLight(Ogre::ColourValue(0.1F, 0.1F, 0.1F));
   Ogre::Light* light = scnMgr->createLight("MainLight");
   light->setType(Ogre::Light::LT_DIRECTIONAL);
+  light->setDiffuseColour(Ogre::ColourValue(1.0f, 1.0f, 0.9f));  // Основной свет (чуть желтоватый, как солнце)
+  light->setSpecularColour(Ogre::ColourValue(1.0f, 1.0f, 1.0f));
 
   Ogre::SceneNode* lightNode = scnMgr->getRootSceneNode()->createChildSceneNode();
   lightNode->setPosition(20, 80, 50);
   lightNode->attachObject(light);
+  lightNode->lookAt(Ogre::Vector3(-1.0f, -1.0f, -1.0f).normalisedCopy(), Ogre::Node::TS_WORLD);
 
   // 3. Камера
   Ogre::SceneNode* camNode = scnMgr->getRootSceneNode()->createChildSceneNode();
@@ -73,15 +75,9 @@ int main() {
   node->setScale(Ogre::Vector3f(50, 50, 50));
 
   auto triangles = RenderHair::Render::convert_mesh_to_triangles(ent->getMesh());
-  std::cout << std::format("TRIANGLES COUNT : {}\n", triangles.size());
-  for (const auto& triangle : triangles) {
-    std::cout << std::format("triangle:\nsubmesh idx: {}\ntriangle idx: {}\n", triangle.submesh_index,
-                             triangle.triangle_index);
-    for (int k = 0; k < 3; ++k) {
-      std::cout << std::format("normals : ({}, {}, {})\n", triangle.normals[k].x, triangle.normals[k].y,
-                               triangle.normals[k].z);
-    }
-  }
+  auto roots = RenderHair::Render::generatePrimitiveRoots(triangles, 1);
+
+  auto* hairModel = new RenderHair::Render::HairModel(*scnMgr, *node, ent->getMesh(), roots);
 
   // ~~~~~
 

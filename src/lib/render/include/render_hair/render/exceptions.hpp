@@ -2,9 +2,8 @@
 
 #include "render_hair/base/exceptions.hpp"
 
-namespace RenderHair::Render {
-
-  class PhysicsException : public Base::Exception {
-    using Exception::Exception;
+namespace RenderHair::Error {
+  class RenderException : public BaseException {
+    using BaseException::BaseException;
   };
-}  // namespace RenderHair::Render
+}  // namespace RenderHair::Error
