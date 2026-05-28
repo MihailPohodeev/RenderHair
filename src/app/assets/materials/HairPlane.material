@@ -14,3 +14,21 @@ material HairPlane
         }
     }
 }
+
+material HairSphere
+{
+    technique
+    {
+        pass
+        {
+            lighting on
+            shading gouraud
+            cull_hardware none
+            texture_unit
+            {
+                texture HairSphere_hair_allocation_map.png
+                filtering bilinear
+            }
+        }
+    }
+}

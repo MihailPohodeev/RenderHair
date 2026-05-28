@@ -51,43 +51,43 @@ namespace RenderHair {
       isFirstFrame_ = false;
     }
 
-    // for (size_t i = 0; i < hairCount_; ++i) {
-    //   const size_t root_idx = i * settings_.nodes_per_hair;
-    //   Ogre::Vector4 res_pos = world_matrix * Ogre::Vector4{localRootsCache_[i], 1.0F};
+    for (size_t i = 0; i < hairCount_; ++i) {
+      const size_t root_idx = i * settings_.nodes_per_hair;
+      Ogre::Vector4 res_pos = world_matrix * Ogre::Vector4{localRootsCache_[i], 1.0F};
 
-    //   currentPositionsCache_[root_idx].x = res_pos.x;
-    //   currentPositionsCache_[root_idx].y = res_pos.y;
-    //   currentPositionsCache_[root_idx].z = res_pos.z;
-    // }
+      currentPositionsCache_[root_idx].x = res_pos.x;
+      currentPositionsCache_[root_idx].y = res_pos.y;
+      currentPositionsCache_[root_idx].z = res_pos.z;
+    }
 
-    // const Ogre::Vector3 gravity(0.0f, -9.81f, 0.0f);
-    // const float damping = 0.97f;
+    const Ogre::Vector3 gravity(0.0f, -9.81f, 0.0f);
+    const float damping = 0.97f;
 
     std::vector<Ogre::Vector4> temp_current{currentPositionsCache_};
 
-    // for (size_t i = 0; i < hairCount_; ++i) {
-    //   for (size_t k = 1; k < settings_.nodes_per_hair; ++k) {
-    //     const size_t index = (i * settings_.nodes_per_hair) + k;
+    for (size_t i = 0; i < hairCount_; ++i) {
+      for (size_t k = 1; k < settings_.nodes_per_hair; ++k) {
+        const size_t index = (i * settings_.nodes_per_hair) + k;
 
-    //     Ogre::Vector3 current_pos{currentPositionsCache_[index].xyz()};
-    //     Ogre::Vector3 prev_pos{previousPositions_[index]};
+        Ogre::Vector3 current_pos{currentPositionsCache_[index].xyz()};
+        Ogre::Vector3 prev_pos{previousPositions_[index]};
 
-    //     Ogre::Vector3 velocity = (current_pos - prev_pos) * damping;
-    //     Ogre::Vector3 next_pos = current_pos + velocity + (gravity * dt * dt);
+        Ogre::Vector3 velocity = (current_pos - prev_pos) * damping;
+        Ogre::Vector3 next_pos = current_pos + velocity + (gravity * dt * dt);
 
-    //     float current_pos_w = currentPositionsCache_[index].w;
-    //     currentPositionsCache_[index] = Ogre::Vector4{next_pos, current_pos_w};
-    //   }
-    // }
+        float current_pos_w = currentPositionsCache_[index].w;
+        currentPositionsCache_[index] = Ogre::Vector4{next_pos, current_pos_w};
+      }
+    }
 
-    // resolveCollisions();
+    resolveCollisions();
 
-    // const float scale_coefficient = extract_axisX_scale_coefficient(world_matrix);
-    // const float target_length =
-    //     (settings_.one_hair_length * scale_coefficient) / static_cast<float>(settings_.nodes_per_hair - 1);
-    // const int constraint_iterations = 5;
-    // const float stiffness = 0.85f;
-    // relaxationConstraints(target_length, constraint_iterations, stiffness);
+    const float scale_coefficient = extract_axisX_scale_coefficient(world_matrix);
+    const float target_length =
+        (settings_.one_hair_length * scale_coefficient) / static_cast<float>(settings_.nodes_per_hair - 1);
+    const int constraint_iterations = 5;
+    const float stiffness = 0.85f;
+    relaxationConstraints(target_length, constraint_iterations, stiffness);
 
     for (size_t i = 0; i < totalNodes_; ++i) { previousPositions_[i] = temp_current[i].xyz(); }
 

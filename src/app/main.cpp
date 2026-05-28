@@ -41,11 +41,11 @@ class KeyHandler : public OgreBites::InputListener {
 template <class HairType>
 class HairFrameListener : public Ogre::FrameListener {
   HairType& hair_;
-  RenderHair::Collider::SphereCollider& sphere_collider_;
+  RenderHair::Collider::SphereCollider* sphere_collider_;
   Ogre::SceneNode& node_;
 
  public:
-  HairFrameListener(HairType& hair, RenderHair::Collider::SphereCollider& sphere_collider, Ogre::SceneNode& node)
+  HairFrameListener(HairType& hair, RenderHair::Collider::SphereCollider* sphere_collider, Ogre::SceneNode& node)
       : hair_{hair},
         sphere_collider_{sphere_collider},
         node_{node} {}
@@ -53,7 +53,8 @@ class HairFrameListener : public Ogre::FrameListener {
   bool frameRenderingQueued(const Ogre::FrameEvent& evt) override {
     hair_.update(evt.timeSinceLastFrame);
     Ogre::Matrix4 world_mat = node_._getFullTransform();
-    sphere_collider_.update(world_mat);
+    if (sphere_collider_ == nullptr) { return true; }
+    sphere_collider_->update(world_mat);
     return true;
   }
 };
@@ -112,13 +113,15 @@ int main() {
 
   // ~~~~~
 
-  Ogre::Entity* ent = scnMgr->createEntity("HairSphere.mesh");
+  Ogre::Entity* ent = scnMgr->createEntity("Head.mesh");
 
   Ogre::SceneNode* node = scnMgr->getRootSceneNode()->createChildSceneNode();
+  node->yaw(Ogre::Radian{3.1415F / 2});
+  node->pitch(Ogre::Radian{3.1415F / 2});
   // node->setScale(50, 50, 50);
   node->attachObject(ent);
 
-  RenderHair::Collider::Sphere sphere{Ogre::Vector3{0.F, 0.F, 0.F}, 1.0F};
+  RenderHair::Collider::Sphere sphere{Ogre::Vector3{-0.01F, 0.F, -0.65F}, 0.65F};
   RenderHair::Collider::SphereCollider collider =
       RenderHair::ColliderManager::getInstance().registerSphereCollider(sphere);
 
@@ -130,7 +133,7 @@ int main() {
   auto* hair_instance = new RenderHair::HairInstance<RenderHair::VerletCPU_HairPhysics>(hair_settings);
 
   auto* hairListener = new HairFrameListener<RenderHair::HairInstance<RenderHair::VerletCPU_HairPhysics>>(
-      *hair_instance, collider, *node);
+      *hair_instance, &collider, *node);
   root->addFrameListener(hairListener);
   // ~~~~~
 

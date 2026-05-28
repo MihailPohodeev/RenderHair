@@ -1,5 +1,6 @@
 #pragma once
 
+#include <OgreLogManager.h>
 #include <OgreMesh.h>
 #include <OgreMeshManager.h>
 #include <OgreSceneNode.h>
@@ -8,6 +9,7 @@
 #include <OgreTechnique.h>
 
 #include <cstdint>
+#include <format>
 #include <memory>
 
 #include "render_hair/render/hair_physics.hpp"
@@ -37,7 +39,9 @@ namespace RenderHair {
           oneHairLength_{settings.one_hair_length},
           sceneNode_{*settings.target_node} {
       std::vector<Ogre::Vector4> hair_nodes =
-          HairRootsGenerator::generateWithMap(settings.mesh, nodesPerOneHair_, oneHairLength_, 8);
+          HairRootsGenerator::generateWithMap(settings.mesh, nodesPerOneHair_, oneHairLength_, 2048);
+
+      Ogre::LogManager::getSingleton().logMessage(std::format("Hairs count = {}", hair_nodes.size()));
 
       if (hair_nodes.empty()) { return; }
 

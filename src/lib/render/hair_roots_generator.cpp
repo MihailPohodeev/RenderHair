@@ -71,7 +71,7 @@ namespace RenderHair {
 
   std::vector<Ogre::Vector4> HairRootsGenerator::generateWithMap(const Ogre::MeshPtr& mesh, int32_t nodes_per_hair,
                                                                  float hair_length, int32_t max_hairs_per_unit_area) {
-    std::vector<Ogre::Vector4> allNodes;
+    std::vector<Ogre::Vector4> all_hair_nodes;
 
     if (nodes_per_hair < 2) {
       std::string error_message = "RenderHair Error: Количество узлов должно быть минимум 2 (корень + кончик).";
@@ -103,8 +103,47 @@ namespace RenderHair {
 
     auto triangles = convert_mesh_to_triangles(mesh);
 
-    for (const auto& triangle : triangles) {}
+    for (const auto& triangle : triangles) {
+      const float triangle_square = triangle.getSquare();
+      float float_attempts = triangle_square * static_cast<float>(max_hairs_per_unit_area);
+      int32_t attempts = static_cast<int32_t>(std::floor(float_attempts));
+      if (dis(gen) < (float_attempts - static_cast<float>(attempts))) { ++attempts; }
 
-    return allNodes;
+      for (int32_t a = 0; a < attempts; ++a) {
+        float r1 = dis(gen);
+        float r2 = dis(gen);
+        if (r1 + r2 > 1.0f) {
+          r1 = 1.0f - r1;
+          r2 = 1.0f - r2;
+        }
+        float r3 = 1.0f - r1 - r2;
+
+        glm::vec2 interpolated_uv =
+            triangle.texture_coords[0] * r1 + triangle.texture_coords[1] * r2 + triangle.texture_coords[2] * r3;
+        interpolated_uv = glm::clamp(interpolated_uv, glm::vec2(0.0f), glm::vec2(1.0f));
+
+        size_t pixel_x = static_cast<size_t>(interpolated_uv.x * static_cast<float>(tex_width - 1));
+        size_t pixel_y = static_cast<size_t>((1.0f - interpolated_uv.y) * static_cast<float>(tex_height - 1));
+        pixel_x = std::clamp(pixel_x, size_t(0), tex_width - 1);
+        pixel_y = tex_height - std::clamp(pixel_y, size_t(0), tex_height - 1);
+        float density = allocation_map.getColourAt(pixel_x, pixel_y, 0).r;
+        if (dis(gen) > density) { continue; }
+
+        glm::vec3 root_pos = triangle.vertices[0] * r1 + triangle.vertices[1] * r2 + triangle.vertices[2] * r3;
+        glm::vec3 normal = triangle.normals[0] * r1 + triangle.normals[1] * r2 + triangle.normals[2] * r3;
+        normal = glm::normalize(normal);
+
+        float current_hair_length = hair_length;
+        float segment_length = current_hair_length / static_cast<float>(nodes_per_hair - 1);
+
+        for (int32_t node_idx = 0; node_idx < nodes_per_hair; ++node_idx) {
+          glm::vec3 node_pos = root_pos + normal * (segment_length * static_cast<float>(node_idx));
+          float weight = (node_idx == 0) ? 0.0f : 1.0f;
+          all_hair_nodes.emplace_back(node_pos.x, node_pos.y, node_pos.z, weight);
+        }
+      }
+    }
+
+    return all_hair_nodes;
   }
 }  // namespace RenderHair
