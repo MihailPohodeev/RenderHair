@@ -6,7 +6,7 @@ vertex_program MyHairVS_GLSL glsl
     // Ogre автоматически передаст матрицу камеры (просмотра-проекции) в шейдер
     default_params
     {
-        param_named_auto worldViewProjMatrix worldviewproj_matrix
+        param_named_auto viewProjMatrix viewproj_matrix
     }
 }
 
@@ -14,26 +14,26 @@ vertex_program MyHairVS_GLSL glsl
 fragment_program MyHairFS_GLSL glsl
 {
     source HairFragment.glsl
+    default_params
+    {
+        param_named_auto nodes_per_hair fp_custom 0
+        param_named top_color float3 1.0 0.0 0.0
+        param_named down_color float3 0.0 0.0 1.0
+    }
 }
 
 // 3. СОЗДАЕМ МАТЕРИАЛ, КОТОРЫЙ ИХ СВЯЗЫВАЕТ
-material MyRedPointMaterial
+material MyHairMaterial
 {
     technique
     {
         pass
         {
-            // Отключаем стандартный свет Ogre, у нас свой шейдер
             lighting off
-
-            // Заставляем драйвер рисовать жирные точки (размер в пикселях)
             point_size 3.0
-
-            // Подключаем наши GLSL шейдеры к этому проходу рендеринга
             vertex_program_ref MyHairVS_GLSL
             {
             }
-
             fragment_program_ref MyHairFS_GLSL
             {
             }

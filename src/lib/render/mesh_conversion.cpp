@@ -2,8 +2,8 @@
 
 #include <OgreSubMesh.h>
 
-namespace RenderHair::Render {
-  std::vector<Triangle> convert_mesh_to_triangles(const Ogre::MeshPtr &mesh) {
+namespace RenderHair {
+  std::vector<Triangle> convert_mesh_to_triangles(Ogre::MeshPtr mesh) {
     std::vector<Triangle> all_triangles;
 
     const size_t submesh_amount = mesh->getNumSubMeshes();
@@ -80,4 +80,4 @@ namespace RenderHair::Render {
     return all_triangles;
   }
 
-}  // namespace RenderHair::Render
+}  // namespace RenderHair

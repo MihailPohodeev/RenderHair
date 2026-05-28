@@ -6,9 +6,9 @@
 
 #include "render_hair/render/triangle.hpp"
 
-namespace RenderHair::Render {
+namespace RenderHair {
 
   [[nodiscard]]
-  std::vector<Triangle> convert_mesh_to_triangles(const Ogre::MeshPtr &mesh);
+  std::vector<Triangle> convert_mesh_to_triangles(Ogre::MeshPtr mesh);
 
 }

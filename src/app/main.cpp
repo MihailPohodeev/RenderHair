@@ -2,15 +2,58 @@
 #include <OgreApplicationContext.h>
 #include <OgreCameraMan.h>
 #include <OgreRTShaderSystem.h>
+#include <OgreTrays.h>
 
-#include "render_hair/render/hair_generator.hpp"
-#include "render_hair/render/hair_model.hpp"
-#include "render_hair/render/mesh_conversion.hpp"
+#include "render_hair/render/collision/collider_manager.hpp"
+#include "render_hair/render/hair_instance.hpp"
+#include "render_hair/render/verlet_cpu_hair_physics.hpp"
 
 class KeyHandler : public OgreBites::InputListener {
+ private:
+  Ogre::SceneNode* sphere_node_;
+  float move_speed_ = 5.0f;  // Скорость движения сферы
+
  public:
+  explicit KeyHandler(Ogre::SceneNode* sphere_node)
+      : sphere_node_(sphere_node) {}
+
   bool keyPressed(const OgreBites::KeyboardEvent& evt) override {
-    if (evt.keysym.sym == OgreBites::SDLK_ESCAPE) { Ogre::Root::getSingleton().queueEndRendering(); }
+    if (evt.keysym.sym == OgreBites::SDLK_ESCAPE) {
+      Ogre::Root::getSingleton().queueEndRendering();
+      return true;
+    }
+
+    if (!sphere_node_) return true;
+
+    Ogre::Vector3 position = sphere_node_->getPosition();
+
+    // IJKL управление по осям X и Z
+    if (evt.keysym.sym == 'i') { position.z -= move_speed_; }  // Вперед
+    if (evt.keysym.sym == 'k') { position.z += move_speed_; }  // Назад
+    if (evt.keysym.sym == 'j') { position.x -= move_speed_; }  // Влево
+    if (evt.keysym.sym == 'l') { position.x += move_speed_; }  // Вправо
+
+    sphere_node_->setPosition(position);
+    return true;
+  }
+};
+
+template <class HairType>
+class HairFrameListener : public Ogre::FrameListener {
+  HairType& hair_;
+  RenderHair::Collider::SphereCollider& sphere_collider_;
+  Ogre::SceneNode& node_;
+
+ public:
+  HairFrameListener(HairType& hair, RenderHair::Collider::SphereCollider& sphere_collider, Ogre::SceneNode& node)
+      : hair_{hair},
+        sphere_collider_{sphere_collider},
+        node_{node} {}
+
+  bool frameRenderingQueued(const Ogre::FrameEvent& evt) override {
+    hair_.update(evt.timeSinceLastFrame);
+    Ogre::Matrix4 world_mat = node_._getFullTransform();
+    sphere_collider_.update(world_mat);
     return true;
   }
 };
@@ -19,7 +62,7 @@ class KeyHandler : public OgreBites::InputListener {
 int main() {
   OgreBites::ApplicationContext ctx("RenderHair");
   ctx.initApp();
-
+  ctx.getRenderWindow()->setVSyncEnabled(true);
   Ogre::Root* root = ctx.getRoot();
   Ogre::SceneManager* scnMgr = root->createSceneManager();
 
@@ -47,7 +90,7 @@ int main() {
 
   // 3. Камера
   Ogre::SceneNode* camNode = scnMgr->getRootSceneNode()->createChildSceneNode();
-  camNode->setPosition(0, 0, 300);
+  camNode->setPosition(0, 0, 20);
   camNode->lookAt(Ogre::Vector3(0, 0, 0), Ogre::Node::TS_WORLD);
 
   cam->setNearClipDistance(1.0);
@@ -56,30 +99,46 @@ int main() {
 
   // 4. Управление
   OgreBites::CameraMan camMan(camNode);
+  camMan.setTopSpeed(5);
   camMan.setStyle(OgreBites::CS_FREELOOK);
   ctx.addInputListener(&camMan);
 
-  KeyHandler keyHandler;
+  auto* overlay_system = ctx.getOverlaySystem();
+  scnMgr->addRenderQueueListener(overlay_system);
+  auto* tray_manager = new OgreBites::TrayManager("Interface", ctx.getRenderWindow());
+  ctx.addInputListener(tray_manager);
+  // Показываем статистику
+  tray_manager->showFrameStats(OgreBites::TL_BOTTOMLEFT);
+
+  // ~~~~~
+
+  Ogre::Entity* ent = scnMgr->createEntity("HairSphere.mesh");
+
+  Ogre::SceneNode* node = scnMgr->getRootSceneNode()->createChildSceneNode();
+  // node->setScale(50, 50, 50);
+  node->attachObject(ent);
+
+  RenderHair::Collider::Sphere sphere{Ogre::Vector3{0.F, 0.F, 0.F}, 1.0F};
+  RenderHair::Collider::SphereCollider collider =
+      RenderHair::ColliderManager::getInstance().registerSphereCollider(sphere);
+
+  RenderHair::HairInstance<RenderHair::VerletCPU_HairPhysics>::Settings hair_settings = {.nodes_per_hair = 5,
+                                                                                         .one_hair_length = 0.5F,
+                                                                                         .scene_manager = scnMgr,
+                                                                                         .target_node = node,
+                                                                                         .mesh = ent->getMesh()};
+  auto* hair_instance = new RenderHair::HairInstance<RenderHair::VerletCPU_HairPhysics>(hair_settings);
+
+  auto* hairListener = new HairFrameListener<RenderHair::HairInstance<RenderHair::VerletCPU_HairPhysics>>(
+      *hair_instance, collider, *node);
+  root->addFrameListener(hairListener);
+  // ~~~~~
+
+  KeyHandler keyHandler{node};
   ctx.addInputListener(&keyHandler);
 
   // Чтобы мышь не убегала
   ctx.setWindowGrab(true);
-
-  // ~~~~~
-
-  Ogre::Entity* ent = scnMgr->createEntity("HairPlane.mesh");
-
-  Ogre::SceneNode* node = scnMgr->getRootSceneNode()->createChildSceneNode();
-  node->attachObject(ent);
-
-  node->setScale(Ogre::Vector3f(50, 50, 50));
-
-  auto triangles = RenderHair::Render::convert_mesh_to_triangles(ent->getMesh());
-  auto roots = RenderHair::Render::generatePrimitiveRoots(triangles, 1);
-
-  auto* hairModel = new RenderHair::Render::HairModel(*scnMgr, *node, ent->getMesh(), roots);
-
-  // ~~~~~
 
   root->startRendering();
   ctx.closeApp();

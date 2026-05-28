@@ -3,7 +3,7 @@ add_executable(RenderHair-app WIN32
     "plugins.cfg.in"
     "resources.cfg.in"
 )
-target_link_libraries(RenderHair-app PRIVATE RenderHair_Lib_Render RenderHair_Lib_Physics)
+target_link_libraries(RenderHair-app PRIVATE RenderHair_Lib_Render)
 RenderHair_setup_target(RenderHair-app)
 
 add_library(RenderHair-Assets INTERFACE
@@ -12,7 +12,7 @@ add_library(RenderHair-Assets INTERFACE
 
     "assets/materials/Hair.material"
 
-    "assets/textures/HairSphere_hair_distribution_map.png"
+    "assets/textures/HairSphere_hair_allocation_map.png"
     "assets/textures/RustySteel.png"
 )
 
