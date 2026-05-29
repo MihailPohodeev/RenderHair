@@ -9,6 +9,7 @@ RenderHair_setup_target(RenderHair-app)
 add_library(RenderHair-Assets INTERFACE
     "shaders/HairVertex.glsl"
     "shaders/HairFragment.glsl"
+    "shaders/HairGeometry.glsl"
 
     "assets/materials/Hair.material"
 

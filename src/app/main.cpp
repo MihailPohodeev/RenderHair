@@ -11,11 +11,14 @@
 class KeyHandler : public OgreBites::InputListener {
  private:
   Ogre::SceneNode* sphere_node_;
-  float move_speed_ = 5.0f;  // Скорость движения сферы
+  Ogre::SceneNode* light_node_;
+  float move_speed_ = 0.1F;  // Скорость движения сферы
+  float rotation_speed_ = 0.01F;
 
  public:
-  explicit KeyHandler(Ogre::SceneNode* sphere_node)
-      : sphere_node_(sphere_node) {}
+  explicit KeyHandler(Ogre::SceneNode* sphere_node, Ogre::SceneNode* light_node)
+      : sphere_node_(sphere_node),
+        light_node_{light_node} {}
 
   bool keyPressed(const OgreBites::KeyboardEvent& evt) override {
     if (evt.keysym.sym == OgreBites::SDLK_ESCAPE) {
@@ -26,14 +29,27 @@ class KeyHandler : public OgreBites::InputListener {
     if (!sphere_node_) return true;
 
     Ogre::Vector3 position = sphere_node_->getPosition();
+    Ogre::Vector3 light_pos = light_node_->getPosition();
+    float rotation = 0.0F;
 
     // IJKL управление по осям X и Z
-    if (evt.keysym.sym == 'i') { position.z -= move_speed_; }  // Вперед
-    if (evt.keysym.sym == 'k') { position.z += move_speed_; }  // Назад
-    if (evt.keysym.sym == 'j') { position.x -= move_speed_; }  // Влево
-    if (evt.keysym.sym == 'l') { position.x += move_speed_; }  // Вправо
+    if (evt.keysym.sym == 'i') { position.z -= move_speed_; }
+    if (evt.keysym.sym == 'k') { position.z += move_speed_; }
+    if (evt.keysym.sym == 'j') { position.x -= move_speed_; }
+    if (evt.keysym.sym == 'l') { position.x += move_speed_; }
+    if (evt.keysym.sym == 'u') { sphere_node_->pitch(Ogre::Radian{rotation_speed_}); }
+    if (evt.keysym.sym == 'o') { sphere_node_->pitch(Ogre::Radian{-rotation_speed_}); }
+
+    if (evt.keysym.sym == 'h') { light_pos.z -= move_speed_; }
+    if (evt.keysym.sym == 'n') { light_pos.z += move_speed_; }
+    if (evt.keysym.sym == 'b') { light_pos.x -= move_speed_; }
+    if (evt.keysym.sym == 'm') { light_pos.x += move_speed_; }
+
+    if (evt.keysym.sym == ',') { light_pos.y -= move_speed_; }
+    if (evt.keysym.sym == '.') { light_pos.y += move_speed_; }
 
     sphere_node_->setPosition(position);
+    light_node_->setPosition(light_pos);
     return true;
   }
 };
@@ -80,14 +96,14 @@ int main() {
   // 2. Свет (сделаем его поярче и подальше)
   scnMgr->setAmbientLight(Ogre::ColourValue(0.1F, 0.1F, 0.1F));
   Ogre::Light* light = scnMgr->createLight("MainLight");
-  light->setType(Ogre::Light::LT_DIRECTIONAL);
+  light->setType(Ogre::Light::LT_POINT);
   light->setDiffuseColour(Ogre::ColourValue(1.0f, 1.0f, 0.9f));  // Основной свет (чуть желтоватый, как солнце)
   light->setSpecularColour(Ogre::ColourValue(1.0f, 1.0f, 1.0f));
 
-  Ogre::SceneNode* lightNode = scnMgr->getRootSceneNode()->createChildSceneNode();
-  lightNode->setPosition(20, 80, 50);
-  lightNode->attachObject(light);
-  lightNode->lookAt(Ogre::Vector3(-1.0f, -1.0f, -1.0f).normalisedCopy(), Ogre::Node::TS_WORLD);
+  Ogre::SceneNode* light_node = scnMgr->getRootSceneNode()->createChildSceneNode();
+  light_node->setPosition(2, 2, 2);
+  light_node->attachObject(light);
+  light_node->lookAt(Ogre::Vector3(0.0f, 0.0f, 0.0f).normalisedCopy(), Ogre::Node::TS_WORLD);
 
   // 3. Камера
   Ogre::SceneNode* camNode = scnMgr->getRootSceneNode()->createChildSceneNode();
@@ -125,7 +141,7 @@ int main() {
   RenderHair::Collider::SphereCollider collider =
       RenderHair::ColliderManager::getInstance().registerSphereCollider(sphere);
 
-  RenderHair::HairInstance<RenderHair::VerletCPU_HairPhysics>::Settings hair_settings = {.nodes_per_hair = 5,
+  RenderHair::HairInstance<RenderHair::VerletCPU_HairPhysics>::Settings hair_settings = {.nodes_per_hair = 10,
                                                                                          .one_hair_length = 0.5F,
                                                                                          .scene_manager = scnMgr,
                                                                                          .target_node = node,
@@ -137,7 +153,7 @@ int main() {
   root->addFrameListener(hairListener);
   // ~~~~~
 
-  KeyHandler keyHandler{node};
+  KeyHandler keyHandler{node, light_node};
   ctx.addInputListener(&keyHandler);
 
   // Чтобы мышь не убегала

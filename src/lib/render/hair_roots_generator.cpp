@@ -138,7 +138,7 @@ namespace RenderHair {
 
         for (int32_t node_idx = 0; node_idx < nodes_per_hair; ++node_idx) {
           glm::vec3 node_pos = root_pos + normal * (segment_length * static_cast<float>(node_idx));
-          float weight = (node_idx == 0) ? 0.0f : 1.0f;
+          float weight = static_cast<float>(node_idx) / nodes_per_hair;
           all_hair_nodes.emplace_back(node_pos.x, node_pos.y, node_pos.z, weight);
         }
       }

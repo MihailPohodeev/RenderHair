@@ -39,7 +39,7 @@ namespace RenderHair {
           oneHairLength_{settings.one_hair_length},
           sceneNode_{*settings.target_node} {
       std::vector<Ogre::Vector4> hair_nodes =
-          HairRootsGenerator::generateWithMap(settings.mesh, nodesPerOneHair_, oneHairLength_, 2048);
+          HairRootsGenerator::generateWithMap(settings.mesh, nodesPerOneHair_, oneHairLength_, 8096);
 
       Ogre::LogManager::getSingleton().logMessage(std::format("Hairs count = {}", hair_nodes.size()));
 
@@ -104,7 +104,7 @@ namespace RenderHair {
       auto params =
           entity_->getSubEntity(0)->getMaterial()->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
       params->setNamedConstant("nodes_per_hair", settings.nodes_per_hair);
-      params->setNamedConstant("top_color", Ogre::Vector3(0.09F, 0.04F, 0.025F));
+      params->setNamedConstant("top_color", Ogre::Vector3(0.0F, 0.0F, 0.0F));
       params->setNamedConstant("down_color", Ogre::Vector3(0.24F, 0.13F, 0.08F));
 
       settings.target_node->attachObject(entity_);

@@ -1,13 +1,13 @@
-#version 150
+#version 460
 
 in vec4 vertex;
-uniform mat4 viewProjMatrix;
 
-out float vertexType;
+out float v_type_raw;
+out vec3 v_pos_raw;
 
 void main()
 {
-    vertexType = vertex.w;
-    vec4 cleanVertex = vec4(vertex.xyz, 1.0);
-    gl_Position = viewProjMatrix * cleanVertex;
+    v_type_raw = vertex.w;
+    v_pos_raw = vertex.xyz;
+    gl_Position = vec4(v_pos_raw, 1.0);
 }

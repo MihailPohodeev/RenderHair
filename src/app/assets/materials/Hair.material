@@ -1,12 +1,20 @@
-// 1. ОБЪЯВЛЯЕМ ВЕРТЕКСНЫЙ ШЕЙДЕР
 vertex_program MyHairVS_GLSL glsl
 {
     source HairVertex.glsl
+}
 
-    // Ogre автоматически передаст матрицу камеры (просмотра-проекции) в шейдер
+geometry_program MyHairGS_GLSL glsl
+{
+    source HairGeometry.glsl
+
+    max_output_vertices 4
+
     default_params
     {
         param_named_auto viewProjMatrix viewproj_matrix
+        param_named_auto cameraPosition camera_position
+        param_named hairWidth float 0.02
+        param_named texScaleY float 5.0
     }
 }
 
@@ -16,9 +24,13 @@ fragment_program MyHairFS_GLSL glsl
     source HairFragment.glsl
     default_params
     {
-        param_named_auto nodes_per_hair fp_custom 0
+        param_named_auto nodes_per_hair int 0
         param_named top_color float3 1.0 0.0 0.0
         param_named down_color float3 0.0 0.0 1.0
+
+        param_named_auto uLightPos light_position 0
+        param_named_auto uLightDiffuse light_diffuse_colour 0
+        param_named_auto uAmbientColor ambient_light_colour
     }
 }
 
@@ -29,13 +41,20 @@ material MyHairMaterial
     {
         pass
         {
-            lighting off
-            point_size 3.0
-            vertex_program_ref MyHairVS_GLSL
+            cull_hardware none
+
+            scene_blend alpha_blend
+
+            vertex_program_ref MyHairVS_GLSL {}
+            geometry_program_ref MyHairGS_GLSL {}
+            fragment_program_ref MyHairFS_GLSL {}
+
+            texture_unit
             {
-            }
-            fragment_program_ref MyHairFS_GLSL
-            {
+                texture white-hair.png
+                tex_address_mode wrap
+                filtering anisotropic
+                max_anisotropy 8
             }
         }
     }
