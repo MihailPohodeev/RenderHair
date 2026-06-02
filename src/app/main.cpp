@@ -7,12 +7,15 @@
 #include "render_hair/render/collision/collider_manager.hpp"
 #include "render_hair/render/hair_instance.hpp"
 #include "render_hair/render/verlet_cpu_hair_physics.hpp"
+// #include "render_hair/render/verlet_gpu_hair_physics.hpp"
+
+using HairPhysicsType = RenderHair::VerletCPU_HairPhysics;
 
 class KeyHandler : public OgreBites::InputListener {
  private:
   Ogre::SceneNode* sphere_node_;
   Ogre::SceneNode* light_node_;
-  float move_speed_ = 0.1F;  // Скорость движения сферы
+  float move_speed_ = 0.05F;  // Скорость движения сферы
   float rotation_speed_ = 0.01F;
 
  public:
@@ -141,15 +144,15 @@ int main() {
   RenderHair::Collider::SphereCollider collider =
       RenderHair::ColliderManager::getInstance().registerSphereCollider(sphere);
 
-  RenderHair::HairInstance<RenderHair::VerletCPU_HairPhysics>::Settings hair_settings = {.nodes_per_hair = 10,
-                                                                                         .one_hair_length = 0.5F,
-                                                                                         .scene_manager = scnMgr,
-                                                                                         .target_node = node,
-                                                                                         .mesh = ent->getMesh()};
-  auto* hair_instance = new RenderHair::HairInstance<RenderHair::VerletCPU_HairPhysics>(hair_settings);
+  RenderHair::HairInstance<HairPhysicsType>::Settings hair_settings = {.nodes_per_hair = 10,
+                                                                       .one_hair_length = 0.3F,
+                                                                       .scene_manager = scnMgr,
+                                                                       .target_node = node,
+                                                                       .mesh = ent->getMesh()};
+  auto* hair_instance = new RenderHair::HairInstance<HairPhysicsType>(hair_settings);
 
-  auto* hairListener = new HairFrameListener<RenderHair::HairInstance<RenderHair::VerletCPU_HairPhysics>>(
-      *hair_instance, &collider, *node);
+  auto* hairListener =
+      new HairFrameListener<RenderHair::HairInstance<HairPhysicsType>>(*hair_instance, &collider, *node);
   root->addFrameListener(hairListener);
   // ~~~~~
 

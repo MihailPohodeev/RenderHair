@@ -1,7 +1,6 @@
 #include "render_hair/render/verlet_cpu_hair_physics.hpp"
 
 #include <cstring>
-#include <iostream>
 
 #include "render_hair/render/collision/collider_manager.hpp"
 #include "render_hair/render/exceptions.hpp"

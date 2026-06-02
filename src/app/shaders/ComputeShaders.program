@@ -1,0 +1,10 @@
+compute_program HairPhysicsCS glsl
+{
+    source HairPhysics.glsl
+
+    profiles glsl460
+
+    default_params
+    {
+    }
+}
