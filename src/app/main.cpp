@@ -140,7 +140,7 @@ int main() {
   // node->setScale(50, 50, 50);
   node->attachObject(ent);
 
-  RenderHair::Collider::Sphere sphere{Ogre::Vector3{-0.01F, 0.F, -0.65F}, 0.65F};
+  RenderHair::Collider::Sphere sphere{Ogre::Vector3{-0.01F, 0.F, -0.65F}, 0.7F};
   RenderHair::Collider::SphereCollider collider =
       RenderHair::ColliderManager::getInstance().registerSphereCollider(sphere);
 

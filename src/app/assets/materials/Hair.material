@@ -13,6 +13,7 @@ geometry_program MyHairGS_GLSL glsl
     {
         param_named_auto viewProjMatrix viewproj_matrix
         param_named_auto cameraPosition camera_position
+        param_named_auto worldMatrix world_matrix
         param_named hairWidth float 0.01
         param_named texScaleY float 2.0
     }
@@ -28,9 +29,13 @@ fragment_program MyHairFS_GLSL glsl
         param_named top_color float3 1.0 0.0 0.0
         param_named down_color float3 0.0 0.0 1.0
 
-        param_named_auto uLightPos light_position 0
+        param_named specular_color float3 0.5 0.5 0.5
+        param_named specular_power float 30.0
+
+        param_named_auto uLightPos light_position_world_space 0
         param_named_auto uLightDiffuse light_diffuse_colour 0
         param_named_auto uAmbientColor ambient_light_colour
+        param_named_auto cameraPosition camera_position_world_space
     }
 }
 
