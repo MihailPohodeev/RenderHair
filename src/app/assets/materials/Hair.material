@@ -30,12 +30,12 @@ fragment_program MyHairFS_GLSL glsl
         param_named down_color float3 0.0 0.0 1.0
 
         param_named specular_color float3 0.5 0.5 0.5
-        param_named specular_power float 30.0
+        param_named specular_power float 500.0
 
-        param_named_auto uLightPos light_position_world_space 0
+        param_named_auto uLightPos light_position 0
         param_named_auto uLightDiffuse light_diffuse_colour 0
         param_named_auto uAmbientColor ambient_light_colour
-        param_named_auto cameraPosition camera_position_world_space
+        param_named_auto cameraPosition camera_position
     }
 }
 

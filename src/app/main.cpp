@@ -43,13 +43,13 @@ class KeyHandler : public OgreBites::InputListener {
     if (evt.keysym.sym == 'u') { sphere_node_->pitch(Ogre::Radian{rotation_speed_}); }
     if (evt.keysym.sym == 'o') { sphere_node_->pitch(Ogre::Radian{-rotation_speed_}); }
 
-    if (evt.keysym.sym == 'h') { light_pos.z -= move_speed_; }
-    if (evt.keysym.sym == 'n') { light_pos.z += move_speed_; }
-    if (evt.keysym.sym == 'b') { light_pos.x -= move_speed_; }
-    if (evt.keysym.sym == 'm') { light_pos.x += move_speed_; }
+    if (evt.keysym.sym == 'h') { light_pos.z -= move_speed_ * 10.F; }
+    if (evt.keysym.sym == 'n') { light_pos.z += move_speed_ * 10.F; }
+    if (evt.keysym.sym == 'b') { light_pos.x -= move_speed_ * 10.F; }
+    if (evt.keysym.sym == 'm') { light_pos.x += move_speed_ * 10.F; }
 
-    if (evt.keysym.sym == ',') { light_pos.y -= move_speed_; }
-    if (evt.keysym.sym == '.') { light_pos.y += move_speed_; }
+    if (evt.keysym.sym == ',') { light_pos.y -= move_speed_ * 10.F; }
+    if (evt.keysym.sym == '.') { light_pos.y += move_speed_ * 10.F; }
 
     sphere_node_->setPosition(position);
     light_node_->setPosition(light_pos);
@@ -86,21 +86,18 @@ int main() {
   Ogre::Root* root = ctx.getRoot();
   Ogre::SceneManager* scnMgr = root->createSceneManager();
 
-  // 1. Настройка RTSS (Критично для Ogre 14)
   Ogre::RTShader::ShaderGenerator* shadergen = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
   shadergen->addSceneManager(scnMgr);
 
-  // Указываем вьюпорту использовать схему шейдеров RTSS
   Ogre::Camera* cam = scnMgr->createCamera("myCam");
   Ogre::Viewport* viewport = ctx.getRenderWindow()->addViewport(cam);
   viewport->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
   viewport->setBackgroundColour(Ogre::ColourValue(0.1F, 0.1F, 0.1F));
 
-  // 2. Свет (сделаем его поярче и подальше)
   scnMgr->setAmbientLight(Ogre::ColourValue(0.1F, 0.1F, 0.1F));
   Ogre::Light* light = scnMgr->createLight("MainLight");
   light->setType(Ogre::Light::LT_POINT);
-  light->setDiffuseColour(Ogre::ColourValue(1.0f, 1.0f, 0.9f));  // Основной свет (чуть желтоватый, как солнце)
+  light->setDiffuseColour(Ogre::ColourValue(1.0f, 1.0f, 0.9f));
   light->setSpecularColour(Ogre::ColourValue(1.0f, 1.0f, 1.0f));
 
   Ogre::SceneNode* light_node = scnMgr->getRootSceneNode()->createChildSceneNode();
@@ -108,7 +105,6 @@ int main() {
   light_node->attachObject(light);
   light_node->lookAt(Ogre::Vector3(0.0f, 0.0f, 0.0f).normalisedCopy(), Ogre::Node::TS_WORLD);
 
-  // 3. Камера
   Ogre::SceneNode* camNode = scnMgr->getRootSceneNode()->createChildSceneNode();
   camNode->setPosition(0, 0, 20);
   camNode->lookAt(Ogre::Vector3(0, 0, 0), Ogre::Node::TS_WORLD);
@@ -117,27 +113,16 @@ int main() {
   cam->setAutoAspectRatio(true);
   camNode->attachObject(cam);
 
-  // 4. Управление
   OgreBites::CameraMan camMan(camNode);
   camMan.setTopSpeed(5);
   camMan.setStyle(OgreBites::CS_FREELOOK);
   ctx.addInputListener(&camMan);
-
-  auto* overlay_system = ctx.getOverlaySystem();
-  scnMgr->addRenderQueueListener(overlay_system);
-  auto* tray_manager = new OgreBites::TrayManager("Interface", ctx.getRenderWindow());
-  ctx.addInputListener(tray_manager);
-  // Показываем статистику
-  tray_manager->showFrameStats(OgreBites::TL_BOTTOMLEFT);
-
-  // ~~~~~
 
   Ogre::Entity* ent = scnMgr->createEntity("Head.mesh");
 
   Ogre::SceneNode* node = scnMgr->getRootSceneNode()->createChildSceneNode();
   node->yaw(Ogre::Radian{3.1415F / 2});
   node->pitch(Ogre::Radian{3.1415F / 2});
-  // node->setScale(50, 50, 50);
   node->attachObject(ent);
 
   RenderHair::Collider::Sphere sphere{Ogre::Vector3{-0.01F, 0.F, -0.65F}, 0.7F};
@@ -154,12 +139,10 @@ int main() {
   auto* hairListener =
       new HairFrameListener<RenderHair::HairInstance<HairPhysicsType>>(*hair_instance, &collider, *node);
   root->addFrameListener(hairListener);
-  // ~~~~~
 
   KeyHandler keyHandler{node, light_node};
   ctx.addInputListener(&keyHandler);
 
-  // Чтобы мышь не убегала
   ctx.setWindowGrab(true);
 
   root->startRendering();
